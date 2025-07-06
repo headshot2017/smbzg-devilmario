@@ -6,3 +6,4 @@ Requires [MelonLoader](https://github.com/LavaGang/MelonLoader/releases) and [Ch
 
 ![image](screenshot.png)
 
+Power Star by Daniel Sun.
