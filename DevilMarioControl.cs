@@ -2976,20 +2976,150 @@ public class DevilMarioControl : CustomBaseCharacter
 
     protected override void Update_CPU_Thoughts()
     {
+        // references: MarioControl, YoshiControl, BasilisxControl
+
         base.Update_CPU_Thoughts();
 
         AI_Bundle AI = (AI_Bundle)typeof(CharacterControl).GetField("AI", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(MyCharacterControl);
 
-        AI_Bundle.DeltaDataModel deltaData = AI.DeltaData;
-        if (!deltaData.ShouldContinueWithProcessing)
+        if (!AI.DeltaData.ShouldContinueWithProcessing)
             return;
 
-        AI.MoodSwitchTimer -= BattleController.instance.UnscaledDeltaTime;
-        if (AI.MoodSwitchTimer <= 0f)
+        if (AI.RethinkCooldown_Movement > 0f)
         {
-            Array values = Enum.GetValues(typeof(AI_Bundle.Enum_Mood));
-            AI.SetMood((AI_Bundle.Enum_Mood)values.GetValue(UnityEngine.Random.Range(0, values.Length)));
-            AI.MoodSwitchTimer = AI.GetRethinkCooldown(AI_Bundle.Enum_RethinkCooldownType.Mood);
+            AI.RethinkCooldown_Movement -= BattleController.instance.UnscaledDeltaTime;
+        }
+        else
+        {
+            if (AI.GetMood() == AI_Bundle.Enum_Mood.Aggressive)
+            {
+                if (AI.DeltaData.distanceToTarget > 6f && UnityEngine.Random.Range(0, 15) == 1 && MyCharacterControl.ParticipantDataReference.Energy.GetCurrent() > 100f)
+                {
+                    AI.PursueIdea = new AI_Bundle.Internal_PursueIdea(UnityEngine.Random.Range(25, 101));
+                }
+                else if (AI.DeltaData.distanceToTarget > 1f)
+                {
+                    AI.MovementIdea.Reset(AI.DeltaData.IsTargetToMyRight ? 1 : (-1));
+                }
+                else
+                {
+                    AI.MovementIdea.Reset(AI.DeltaData.IsTargetToMyRight ? 1 : (-1), 1f, JustTurn: true);
+                }
+            }
+            else if (AI.GetMood() == AI_Bundle.Enum_Mood.Defensive)
+            {
+                if (AI.DeltaData.distanceToTarget > 6f)
+                {
+                    AI.MovementIdea.Reset(AI.DeltaData.IsTargetToMyRight ? 1 : (-1));
+                }
+                else
+                {
+                    AI.MovementIdea.Reset(AI.DeltaData.IsTargetToMyRight ? 1 : (-1), 1f, JustTurn: true);
+                }
+            }
+            else if (AI.GetMood() == AI_Bundle.Enum_Mood.Tactical)
+            {
+                if (AI.DeltaData.distanceToTarget > 1f)
+                {
+                    AI.MovementIdea.Reset(AI.DeltaData.IsTargetToMyRight ? 1 : (-1));
+                }
+                else
+                {
+                    AI.MovementIdea.Reset(AI.DeltaData.IsTargetToMyRight ? 1 : (-1), 1f, JustTurn: true);
+                }
+
+                if (AI.DeltaData.vectorToTarget_Absolute.x > 6f)
+                {
+                    AI.JumpIdea = new AI_Bundle.Internal_JumpIdea(IsFullJump: true, AI.DeltaData.IsTargetToMyRight ? 1 : (-1));
+                }
+            }
+
+            AI.RethinkCooldown_Movement = AI.GetRethinkCooldown(AI_Bundle.Enum_RethinkCooldownType.Movement);
+        }
+
+        if (AI.RethinkCooldown_Guarding > 0f)
+            AI.RethinkCooldown_Guarding -= BattleController.instance.UnscaledDeltaTime;
+        else
+            AI.FireMarioFireballHandling(this, AI.DeltaData.Target);
+
+        if (AI.CommandList.ActionQueue.Count > 0)
+            AI_CommandList_Update();
+        else
+        {
+            if (IsAttacking)
+                return;
+
+            if (AI.RethinkCooldown_Attacking > 0f)
+            {
+                AI.RethinkCooldown_Attacking -= BattleController.instance.UnscaledDeltaTime;
+                return;
+            }
+
+            if (IsOnGround && AI.DeltaData.IsCriticalHitReady && UnityEngine.Random.Range(0, 3) == 1 &&
+                0f <= AI.DeltaData.vectorToTarget_Absolute.x && AI.DeltaData.vectorToTarget_Absolute.x <= 1.5f &&
+                0f <= AI.DeltaData.vectorToTarget_Absolute.y && AI.DeltaData.vectorToTarget_Absolute.y <= 1f)
+            {
+                AI.RethinkCooldown_Attacking = AI.GetRethinkCooldown(AI_Bundle.Enum_RethinkCooldownType.Attacking);
+                AI.AttackIdea = new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Down, ZTrigger: true);
+            }
+
+            if (IsOnGround && MyCharacterControl.ParticipantDataReference.Energy.GetCurrent() > 100f && UnityEngine.Random.Range(0, 8) == 1 && AI.DeltaData.vectorToTarget_Absolute.x < 2f)
+            {
+                if (AI.DeltaData.IsTargetToMyRight != IsFacingRight)
+                {
+                    AI.MovementIdea.Reset((AI.DeltaData.directionToTarget.x > 0f) ? 1 : (-1), 5f, JustTurn: true);
+                }
+
+                AI.AttackIdea = new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: true, SuperInput: true);
+                AI.RethinkCooldown_Attacking = AI.GetRethinkCooldown(AI_Bundle.Enum_RethinkCooldownType.Attacking);
+            }
+
+            if (AI.RethinkCooldown_Attacking > 0)
+                return;
+
+            if (AI.DeltaData.IsTargetWithinAltitude)
+            {
+                if (AI.DeltaData.vectorToTarget_Absolute.x <= 1.5f)
+                {
+                    if (IsOnGround)
+                    {
+                        switch (UnityEngine.Random.Range(1, 4))
+                        {
+                            case 1:
+                                AI.CommandList.Set(new AI_Bundle.AI_Action[]
+                                {
+                                    new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false)),
+                                    new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false)),
+                                    new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false)),
+                                }, () => AI.DeltaData.vectorToTarget_Absolute.x > 3f);
+                                break;
+
+                            case 2:
+                                AI.MovementIdea.Reset(0);
+                                AI.RethinkCooldown_Movement = AI.GetRethinkCooldown(AI_Bundle.Enum_RethinkCooldownType.Movement);
+                                AI.CommandList.Set(new AI_Bundle.AI_Action[]
+                                {
+                                    new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false)),
+                                    new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false), 0.3f),
+                                    new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false), 0.3f),
+                                    new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Up, ZTrigger: false))
+                                }, () => AI.DeltaData.vectorToTarget_Absolute.x > 3f);
+                                if (AI.Difficulty >= AI_Bundle.Enum_DifficultyLevel.Normal)
+                                {
+                                    AI.CommandList.ActionQueue.Add(new AI_Bundle.AI_Action(new AI_Bundle.Internal_JumpIdea(true, FaceDir)));
+                                    AI.CommandList.ActionQueue.Add(new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false), 0.05f));
+                                    if (AI.Difficulty == AI_Bundle.Enum_DifficultyLevel.Hard)
+                                        AI.CommandList.ActionQueue.Add(new AI_Bundle.AI_Action(new AI_Bundle.Internal_AttackIdea(AI_Bundle.Enum_DirectionalInput.Neutral, ZTrigger: false)));
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
         }
     }
 }
