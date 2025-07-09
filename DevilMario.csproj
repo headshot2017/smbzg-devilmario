@@ -270,6 +270,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="CustomKoopaBroControl.cs" />
+		<Compile Include="CustomKoopaRedControl.cs" />
 		<Compile Include="DevilBooControl.cs" />
 		<Compile Include="DevilMarioInventoryDataModel.cs" />
 		<Compile Include="Core.cs" />

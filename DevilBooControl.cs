@@ -40,14 +40,14 @@ public class DevilBooControl : CustomBaseCharacter
 
             if (Enum == PossessedENUM.KoopaBro)
             {
-                KoopaBroControl KoopaNPC = (KoopaBroControl)Target;
-                SpriteRenderer Comp_SprRen = (SpriteRenderer)KoopaNPC.GetType().GetField("Comp_SprRen", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaNPC);
-                KoopaRedControl KoopaLeader = (KoopaRedControl)KoopaNPC.GetType().GetField("KoopaLeader", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaNPC);
-                List<KoopaBroControl> KoopaBroQueue = (List<KoopaBroControl>)KoopaLeader.GetType().GetField("KoopaBroQueue", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaLeader);
+                CustomKoopaBroControl KoopaNPC = (CustomKoopaBroControl)Target;
+                SpriteRenderer Comp_SprRen = (SpriteRenderer)typeof(KoopaBroControl).GetField("Comp_SprRen", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaNPC);
+                CustomKoopaRedControl KoopaLeader = KoopaNPC.KoopaLeader;
 
                 Comp_SprRen.material.color = Color.white;
-                KoopaBroQueue.Insert(KoopaBroQueue.Count, KoopaNPC);
-                KoopaNPC.GetType().GetMethod("ClearQueue", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(KoopaNPC, null);
+                KoopaLeader.KoopaBroQueue.Insert(KoopaLeader.KoopaBroQueue.Count, KoopaNPC);
+                typeof(KoopaBroControl).GetMethod("ClearQueue", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(KoopaNPC, null);
+                KoopaNPC.ActualLeader = KoopaLeader;
             }
             else
             {
@@ -79,11 +79,11 @@ public class DevilBooControl : CustomBaseCharacter
             switch(Enum)
             {
                 case PossessedENUM.KoopaBro:
-                    KoopaBroControl KoopaTarget = (KoopaBroControl)Target;
-                    SpriteRenderer Comp_SprRen = (SpriteRenderer)KoopaTarget.GetType().GetField("Comp_SprRen", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaTarget);
+                    CustomKoopaBroControl KoopaTarget = (CustomKoopaBroControl)Target;
+                    SpriteRenderer Comp_SprRen = (SpriteRenderer)typeof(KoopaBroControl).GetField("Comp_SprRen", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaTarget);
                     Comp_SprRen.material.color = new Color(1, 0.75f, 0.75f);
 
-                    KoopaRedControl KoopaLeader = (KoopaRedControl)KoopaTarget.GetType().GetField("KoopaLeader", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaTarget);
+                    CustomKoopaRedControl KoopaLeader = KoopaTarget.KoopaLeader;
                     PlayerStateENUM k_PlayerState = (PlayerStateENUM)KoopaLeader.GetType().GetField("PlayerState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaLeader);
                     bool k_IsRushing = (bool)KoopaLeader.GetType().GetField("IsRushing", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaLeader);
                     if (k_IsRushing || k_PlayerState == PlayerStateENUM.Cinematic_NoInput)
@@ -551,7 +551,7 @@ public class DevilBooControl : CustomBaseCharacter
             return false;
 
         Possession.Enum = PossessedENUM.None;
-        if (target.GetType() == typeof(KoopaBroControl))
+        if (target.GetType() == typeof(CustomKoopaBroControl))
             Possession.Enum = PossessedENUM.KoopaBro;
         else if (target.GetType() == typeof(AxemPinkControl))
             Possession.Enum = PossessedENUM.AxemPink;
@@ -632,12 +632,12 @@ public class DevilBooControl : CustomBaseCharacter
             BaseAxemRanger_NPC AxemNPC = (BaseAxemRanger_NPC)Possession.Target;
             AxemNPC.ClearTaskQueue();
         }
-        else if (Possession.Target.GetType() == typeof(KoopaBroControl))
+        else if (Possession.Target.GetType() == typeof(CustomKoopaBroControl))
         {
-            KoopaBroControl KoopaNPC = (KoopaBroControl)Possession.Target;
-            KoopaRedControl KoopaLeader = (KoopaRedControl)KoopaNPC.GetType().GetField("KoopaLeader", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaNPC);
-            List<KoopaBroControl> KoopaBroQueue = (List<KoopaBroControl>)KoopaLeader.GetType().GetField("KoopaBroQueue", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(KoopaLeader);
-            KoopaBroQueue.RemoveAt(KoopaBroQueue.IndexOf(KoopaNPC));
+            CustomKoopaBroControl KoopaNPC = (CustomKoopaBroControl)Possession.Target;
+            CustomKoopaRedControl KoopaLeader = KoopaNPC.KoopaLeader;
+            KoopaLeader.KoopaBroQueue.RemoveAt(KoopaLeader.KoopaBroQueue.IndexOf(KoopaNPC));
+            KoopaNPC.ActualLeader = Leader;
         }
 
         CustomEffectSprite fx = CustomEffectSprite.Create(Possession.Target.transform.position, cc.effects["booParticle"], FaceDir == 1, true);
