@@ -3,7 +3,7 @@ using UnityEngine;
 using SMBZG;
 using System.Reflection;
 
-[assembly: MelonInfo(typeof(DevilMarioMod.Core), "DevilMario", "1.0.0", "Headshotnoby/headshot2017", null)]
+[assembly: MelonInfo(typeof(DevilMarioMod.Core), "DevilMario", "1.0.1", "Headshotnoby/headshot2017", null)]
 [assembly: MelonGame("Jonathan Miller aka Zethros", "SMBZ-G")]
 
 namespace DevilMarioMod
@@ -27,14 +27,14 @@ namespace DevilMarioMod
             devilMarioCC = cc;
 
             GameObject Prefab = cc.characterData.Prefab_BattleGameObject;
-            SonicControl old = Prefab.GetComponent<SonicControl>(); // CharLoader takes Sonic's character prefab as a base
+            CustomBaseCharacter old = Prefab.GetComponent<CustomBaseCharacter>();
             DevilMarioControl devilMario = Prefab.AddComponent<DevilMarioControl>();
             devilMario.Comp_Hurtbox = old.Comp_Hurtbox;
             devilMario.CharacterData = cc.characterData;
             GameObject.Destroy(old);
 
             GameObject BooPrefab = cc.companions["Boo"].prefab;
-            old = BooPrefab.GetComponent<SonicControl>(); // same with companions
+            old = BooPrefab.GetComponent<CustomBaseCharacter>();
             DevilBooControl devilBoo = BooPrefab.AddComponent<DevilBooControl>();
             devilBoo.Comp_Hurtbox = old.Comp_Hurtbox;
             devilBoo.cc = cc;
