@@ -2170,18 +2170,9 @@ public class DevilMarioControl : CustomBaseCharacter
             InventoryData.ReloadSpeedMultiplier = 1f;
     }
 
-    public override void PerformAction_Dodge(Vector2? directionOverride = null)
-    {
-        base.PerformAction_Dodge(directionOverride);
-        CurrentAttackData.ExecuteCustomQueue();
-    }
-
     public override void PerformAction_Strike()
     {
         base.PerformAction_Strike();
-        base.HitBox_0.transform.localPosition = Vector3.zero;
-        base.HitBox_0.transform.localScale = new Vector3(2, 2, 1);
-        base.HitBox_0.IsActive = true;
 
         HitBoxDamageParameters damageParameters = GetHitboxDamageProperties();
         damageParameters.OnHitSoundEffect = cc.sounds[$"hit{UnityEngine.Random.Range(6, 8)}"];
@@ -2191,9 +2182,6 @@ public class DevilMarioControl : CustomBaseCharacter
     public override void PerformAction_Finale(CharacterControl target)
     {
         base.PerformAction_Finale(target);
-
-        Comp_CustomAnimator.m_CurrentProperties.Bursting = false;
-        Comp_CustomAnimator.m_CurrentProperties.DontChangeSprite = true;
 
         HitBoxDamageParameters damageParameters = GetHitboxDamageProperties();
         damageParameters.OnHitSoundEffect = cc.sounds["hit_maximum"];
