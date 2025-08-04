@@ -35,8 +35,7 @@ public class DevilBooControl : CustomBaseCharacter
             foreach (Transform transform in transforms)
                 transform.tag = OriginalTag;
 
-            MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-            PlaySoundMethod.Invoke(SoundCache.ins, new object[] { EndSound, 1f, true, null, 1f, false });
+            SoundCache.ins.PlaySound(EndSound);
 
             if (Enum == PossessedENUM.KoopaBro)
             {
@@ -193,7 +192,7 @@ public class DevilBooControl : CustomBaseCharacter
     {
         base.Update();
 
-        if ((bool)typeof(BattleController).GetField("IsPaused", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance))
+        if (SMBZGlobals.IsPaused)
         {
             return;
         }
@@ -253,8 +252,7 @@ public class DevilBooControl : CustomBaseCharacter
         Comp_SpriteRenderer.enabled = true;
         Spawned = true;
 
-        MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-        PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["boo"], 1f, true, null, 1f, false });
+        SoundCache.ins.PlaySound(cc.sounds["boo"]);
         Comp_CustomAnimator.Play("Idle");
 
         CustomEffectSprite fx = CustomEffectSprite.Create(transform.position, cc.effects["booParticle"], FaceDir == 1, true);
@@ -305,16 +303,13 @@ public class DevilBooControl : CustomBaseCharacter
             request.energyGain = request.damage * 1f;
         }
 
-        MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-
-        IntensityDataStore Intensity = (IntensityDataStore)typeof(BattleController).GetField("Intensity", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-        Intensity.IncreaseBy(request.intensity);
+        SMBZGlobals.Intensity.IncreaseBy(request.intensity);
         if (base.IsGuarding && !request.isBackAttack && !request.isUnblockable)
         {
             SetVelocity(request.blockedLaunch);
             SetField("BlockStun", request.blockStun.Value);
             EffectSprite.Create(base.transform.position, EffectSprite.Sprites.HitsparkBlock, FaceDir == 1);
-            PlaySoundMethod.Invoke(SoundCache.ins, new object[] { SoundCache.ins.Battle_Hit_1B, 0.5f, true, null, 1f, false });
+            SoundCache.ins.PlaySound(SoundCache.ins.Battle_Hit_1B);
             request.AttackingParticipant.IncrementEnergy(request.energyGain.Value * 0.5f * request.AttackingParticipant.GetActiveEnergyGainMultiplier());
         }
         else
@@ -336,7 +331,7 @@ public class DevilBooControl : CustomBaseCharacter
 
             if (request.OnHitSoundEffect != null)
             {
-                PlaySoundMethod.Invoke(SoundCache.ins, new object[] { request.OnHitSoundEffect, 0.5f, true, null, 1f, false });
+                SoundCache.ins.PlaySound(request.OnHitSoundEffect);
             }
 
             if (base.IsOnGround && request.launch.y < -5f)
@@ -354,7 +349,7 @@ public class DevilBooControl : CustomBaseCharacter
             ClearTaskQueue();
             InterruptAndNullifyPreparedAttack();
             request.AttackingParticipant.IncrementEnergy(request.energyGain.Value * 0.5f * request.AttackingParticipant.GetActiveEnergyGainMultiplier());
-            OnDamaged();
+            OnDamaged(request.damage);
         }
 
         PursueData = null;
@@ -463,8 +458,7 @@ public class DevilBooControl : CustomBaseCharacter
         CustomEffectSprite fx = CustomEffectSprite.Create(transform.position, cc.effects["booParticle"], FaceDir == 1, true);
         fx.AnchorPositionToObject(Leader.transform, Vector2.zero);
 
-        MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-        PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["boo_return"], 0.75f, true, null, 1f, false });
+        SoundCache.ins.PlaySound(cc.sounds["boo_return"], 0.75f);
 
         Despawn();
         yield break;

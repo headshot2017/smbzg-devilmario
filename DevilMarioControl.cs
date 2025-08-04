@@ -1,10 +1,7 @@
 ﻿using MelonLoader;
-using HarmonyLib;
-using SMBZG;
 using System.Reflection;
 using System.Collections;
 using UnityEngine;
-using static SMBZG.BattleCameraManager;
 
 public class DevilMarioControl : CustomBaseCharacter
 {
@@ -709,17 +706,12 @@ public class DevilMarioControl : CustomBaseCharacter
                     CharacterControl t_MyCharacterControl =
                         (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
 
-                    MethodInfo IsThereTwoOrLessPlayersAreAlive = typeof(BattleController).GetMethod("IsThereTwoOrLessPlayersAreAlive", BindingFlags.NonPublic | BindingFlags.Instance);
-                    if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
-                    {
-                        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                        CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
-                    }
+                    if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
+                        SMBZGlobals.CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
 
                     if (SaveData.Data.MovementRush_IsEnabled_ViaFullStunStrikes)
                     {
-                        MovementRushManager MRManager = (MovementRushManager)typeof(BattleController).GetField("MovementRushManager", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(BattleController.instance);
-                        MRManager.StartNewMovementRush(IsFacingRight, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { t_MyCharacterControl });
+                        SMBZGlobals.MovementRushManager.StartNewMovementRush(IsFacingRight, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { t_MyCharacterControl });
                     }
                     else
                     {
@@ -1020,11 +1012,9 @@ public class DevilMarioControl : CustomBaseCharacter
                 {
                     GroundGrab = -1;
 
-                    MethodInfo IsThereTwoOrLessPlayersAreAlive = typeof(BattleController).GetMethod("IsThereTwoOrLessPlayersAreAlive", BindingFlags.NonPublic | BindingFlags.Instance);
-                    if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
+                    if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
                     {
-                        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                        CameraManager.SetTargetGroup(MyCharacterControl.transform);
+                        SMBZGlobals.CameraManager.SetTargetGroup(MyCharacterControl.transform);
                     }
 
                     UpdateSpriteSortOrder(-2);
@@ -1060,9 +1050,8 @@ public class DevilMarioControl : CustomBaseCharacter
                     else
                         target_Comp_Animator.enabled = true;
 
-                    BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                    CameraManager.SetTargetGroup_Default();
-                    CameraManager.SetFocusPosition(null);
+                    SMBZGlobals.CameraManager.SetTargetGroup_Default();
+                    SMBZGlobals.CameraManager.SetFocusPosition(null);
 
                     Transform targetTransform = grappled.Comp_SpriteContainer;
                     if (!targetTransform)
@@ -1079,9 +1068,8 @@ public class DevilMarioControl : CustomBaseCharacter
                 {
                     Comp_InterplayerCollider.Enable();
 
-                    BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                    CameraManager.SetTargetGroup_Default();
-                    CameraManager.SetFocusPosition(null);
+                    SMBZGlobals.CameraManager.SetTargetGroup_Default();
+                    SMBZGlobals.CameraManager.SetFocusPosition(null);
 
                     CurrentAttackData = null;
                     SetPlayerState(PlayerStateENUM.Idle);
@@ -1126,9 +1114,8 @@ public class DevilMarioControl : CustomBaseCharacter
                         else
                             target_Comp_Animator.enabled = true;
 
-                        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                        CameraManager.SetTargetGroup_Default();
-                        CameraManager.SetFocusPosition(null);
+                        SMBZGlobals.CameraManager.SetTargetGroup_Default();
+                        SMBZGlobals.CameraManager.SetFocusPosition(null);
 
                         Transform targetTransform = grappled.Comp_SpriteContainer;
                         if (!targetTransform)
@@ -1296,8 +1283,7 @@ public class DevilMarioControl : CustomBaseCharacter
         AnimationNameHash = ASN_AirGrab_Land,
         OnAnimationStart = delegate
         {
-            MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-            PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["hit4"], 1f, true, null, 1f, false });
+            SoundCache.ins.PlaySound(cc.sounds["hit4"]);
 
             CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
             Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
@@ -1357,8 +1343,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 {
                     Comp_InterplayerCollider.Enable();
                     ResetGravity();
-                    MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-                    PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["explosion"], 1f, true, null, 1f, false });
+                    SoundCache.ins.PlaySound(cc.sounds["explosion"]);
                 }
             };
             atk.OnCustomQueue = delegate
@@ -1445,12 +1430,9 @@ public class DevilMarioControl : CustomBaseCharacter
         AnimationNameHash = ASN_Groundbreaker_Land,
         OnAnimationStart = delegate
         {
-            BattleBackgroundManager BackgroundManager = (BattleBackgroundManager)typeof(BattleController).GetField("BackgroundManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-            BattleBackgroundData ActiveBattleBackgroundData = (BattleBackgroundData)typeof(BattleBackgroundManager).GetField("ActiveBattleBackgroundData", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BackgroundManager);
-            BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-            CameraManager.SetShake(0.2f, 0.15f);
-            if (ActiveBattleBackgroundData.Prefab_Crater != null)
-                GameObject.Instantiate(ActiveBattleBackgroundData.Prefab_Crater, GetGroundPositionViaRaycast(), Quaternion.identity);
+            SMBZGlobals.CameraManager.SetShake(0.2f, 0.15f);
+            if (SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater != null)
+                GameObject.Instantiate(SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater, GetGroundPositionViaRaycast(), Quaternion.identity);
 
             ResetGravity();
             SetPlayerState(PlayerStateENUM.Attacking);
@@ -1501,8 +1483,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     dmgProperties.OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
                     {
                         dmgProperties.OnHitSoundEffect = cc.sounds[$"hit{UnityEngine.Random.Range(8, 10)}"];
-                        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                        CameraManager.SetShake(0.04f, 0.08f);
+                        SMBZGlobals.CameraManager.SetShake(0.04f, 0.08f);
                     };
                     SetPlayerState(PlayerStateENUM.Attacking);
                     SetHitboxDamageProperties(dmgProperties);
@@ -1536,8 +1517,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     dmgProperties.HitSpark = new EffectSprite.Parameters(EffectSprite.Sprites.HitsparkHeavy);
                     dmgProperties.OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
                     {
-                        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                        CameraManager.SetShake(0.05f, 0.1f);
+                        SMBZGlobals.CameraManager.SetShake(0.05f, 0.1f);
                     };
                 }
             };
@@ -1666,21 +1646,17 @@ public class DevilMarioControl : CustomBaseCharacter
                     SetField("IsIntangible", true);
                     if (SaveData.Data.MovementRush_IsEnabled_ViaCriticalStrikes)
                     {
-                        MovementRushManager MRManager = (MovementRushManager)typeof(BattleController).GetField("MovementRushManager", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(BattleController.instance);
                         CharacterControl targetControl = (CharacterControl)GetType().GetField("MyCharacterControl", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(target);
-
-                        MRManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { targetControl });
+                        SMBZGlobals.MovementRushManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { targetControl });
                     }
                     else
                     {
                         CharacterControl t_MyCharacterControl =
                         (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
 
-                        MethodInfo IsThereTwoOrLessPlayersAreAlive = typeof(BattleController).GetMethod("IsThereTwoOrLessPlayersAreAlive", BindingFlags.NonPublic | BindingFlags.Instance);
-                        if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
+                        if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
                         {
-                            BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                            CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
+                            SMBZGlobals.CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
                         }
 
                         target.SetVelocity(20 * FaceDir, 10f);
@@ -1690,8 +1666,7 @@ public class DevilMarioControl : CustomBaseCharacter
                         RushProperties.Target = target;
                         Begin_Rush();
 
-                        IntensityDataStore Intensity = (IntensityDataStore)typeof(BattleController).GetField("Intensity", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                        Intensity.Clear();
+                        SMBZGlobals.Intensity.Clear();
                     }
                 }
             };
@@ -1943,8 +1918,7 @@ public class DevilMarioControl : CustomBaseCharacter
         AnimationNameHash = ASN_Rush4d_Spin,
         OnAnimationStart = delegate
         {
-            MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-            PlaySoundMethod.Invoke(SoundCache.ins, new object[] { SoundCache.ins.MarioWorld_CapedSpin, 1f, true, null, 1f, false });
+            SoundCache.ins.PlaySound(SoundCache.ins.MarioWorld_CapedSpin);
 
             SetVelocity(0, 6);
             SetHitboxDamageProperties(new HitBoxDamageParameters
@@ -2034,27 +2008,24 @@ public class DevilMarioControl : CustomBaseCharacter
 
             BattleController.instance.WhiteFlash.Flash();
             BattleController.instance.Cinematic_SlowMotion(0.1f, 1f);
-            BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-            CameraManager.SetShake(3f, 0.2f);
+            SMBZGlobals.CameraManager.SetShake(3f, 0.2f);
 
-            MethodInfo IsThereTwoOrLessPlayersAreAlive = typeof(BattleController).GetMethod("IsThereTwoOrLessPlayersAreAlive", BindingFlags.NonPublic | BindingFlags.Instance);
-            if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
+            if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
             {
-                CameraManager.SetTargetGroup(MyCharacterControl.transform);
+                SMBZGlobals.CameraManager.SetTargetGroup(MyCharacterControl.transform);
             }
 
-            MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-            AudioSource src = (AudioSource)PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["swoophit"], 1f, true, null, 1f, false });
+            AudioSource src = SoundCache.ins.PlaySound(cc.sounds["swoophit"]);
 
             target.SetGravityOverride(0);
             target.AddOnContactGroundWhileHurtCallback(delegate
             {
                 target.SetVelocity(0, 0);
                 target.ResetGravity();
-                CameraManager.SetShake(0, 0);
-                CameraManager.SetShake(0.75f, 0.2f);
+                SMBZGlobals.CameraManager.SetShake(0, 0);
+                SMBZGlobals.CameraManager.SetShake(0.75f, 0.2f);
                 src.Stop();
-                PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["explosion"], 1f, true, null, 1f, false });
+                SoundCache.ins.PlaySound(cc.sounds["explosion"]);
 
                 Vector2 groundPositionViaRaycast2 = target.GetGroundPositionViaRaycast();
                 EffectSprite effectSprite = EffectSprite.Create(groundPositionViaRaycast2, EffectSprite.Sprites.DustExplosion, isFacingRight: true, 1f, 0f, AnimateUsingUnscaledTime: false, AlwaysAppearAboveFighters: true);
@@ -2063,10 +2034,8 @@ public class DevilMarioControl : CustomBaseCharacter
                 DustPoofEffect.Create(effectSprite.transform.position, DustPoofEffect.Animations.DustPoof_Gray, isFacingRight: false, 3f, AnimateUsingUnscaledTime: false, AlwaysAppearAboveFighters: true, 5f, 0.25f);
                 DustPoofEffect.Create(effectSprite.transform.position + Vector3.right, DustPoofEffect.Animations.DustPoof_Gray, isFacingRight: true, 3f, AnimateUsingUnscaledTime: false, AlwaysAppearAboveFighters: true, 3f, 0.25f);
 
-                BattleBackgroundManager BackgroundManager = (BattleBackgroundManager)typeof(BattleController).GetField("BackgroundManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                BattleBackgroundData ActiveBattleBackgroundData = (BattleBackgroundData)typeof(BattleBackgroundManager).GetField("ActiveBattleBackgroundData", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BackgroundManager);
-                if (ActiveBattleBackgroundData.Prefab_Crater != null)
-                    GameObject.Instantiate(ActiveBattleBackgroundData.Prefab_Crater, groundPositionViaRaycast2, Quaternion.identity);
+                if (SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater != null)
+                    GameObject.Instantiate(SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater, groundPositionViaRaycast2, Quaternion.identity);
             });
         }
     };
@@ -2192,8 +2161,7 @@ public class DevilMarioControl : CustomBaseCharacter
 
     protected override void OnMovementRush_Clash()
     {
-        MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-        PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["explosion"], 1f, true, null, 1f, false });
+        SoundCache.ins.PlaySound(cc.sounds["explosion"]);
     }
 
     public override void OnClash(BaseCharacter opponent)
@@ -2202,8 +2170,7 @@ public class DevilMarioControl : CustomBaseCharacter
 
         if ((bool)GetProperty("IgnoreClashes")) return;
 
-        MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-        PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["explosion"], 1f, true, null, 1f, false });
+        SoundCache.ins.PlaySound(cc.sounds["explosion"]);
     }
 
     protected override void Update_General()
@@ -2245,8 +2212,6 @@ public class DevilMarioControl : CustomBaseCharacter
 
             if (PursueData.StartupCountdown <= 0f && (!(bool)p_isCharging.GetValue(PursueData) || ((bool)p_isCharging.GetValue(PursueData) && PursueData.ChargePower >= 100f)) && IsOnGround)
             {
-                MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-
                 PursueData.PursueCountdown = 10f;
                 PursueData.IsPursuing = true;
                 PursueData.IsPreping = false;
@@ -2264,7 +2229,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     return;
                 }
 
-                PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["pursue"], 1f, true, null, 1f, false });
+                SoundCache.ins.PlaySound(cc.sounds["pursue"]);
                 EffectSprite.Create(groundCheck.position, EffectSprite.Sprites.DustPuff, FaceDir == 1);
 
                 SetupPursueHitbox();
@@ -2301,19 +2266,14 @@ public class DevilMarioControl : CustomBaseCharacter
 
     public IEnumerator SuperPursueCinematic()
     {
-        MethodInfo IsThereTwoOrLessPlayersAreAlive = typeof(BattleController).GetMethod("IsThereTwoOrLessPlayersAreAlive", BindingFlags.Instance | BindingFlags.NonPublic);
-        MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
-        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-
         SetField("IsIntangible", true);
         Comp_InterplayerCollider.Disable();
 
-        if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
+        if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
         {
-            CameraSettingsDataStore Settings = (CameraSettingsDataStore)typeof(BattleCameraManager).GetField("Settings", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(CameraManager);
-            CameraManager.SetTargetGroup(MyCharacterControl.transform);
-            Settings.FocusZoom = 3f;
-            Settings.MoveSpeed = 40f;
+            SMBZGlobals.CameraManager.SetTargetGroup(MyCharacterControl.transform);
+            SMBZGlobals.CameraSettings.FocusZoom = 3f;
+            SMBZGlobals.CameraSettings.MoveSpeed = 40f;
         }
 
         BattleController.instance.Cinematic_PauseAndDim(0.9f);
@@ -2322,8 +2282,8 @@ public class DevilMarioControl : CustomBaseCharacter
 
         SetField("IsIntangible", false);
         Comp_InterplayerCollider.Enable();
-        CameraManager.ResetSettings();
-        PlaySoundMethod.Invoke(SoundCache.ins, new object[] { cc.sounds["pursue"], 1f, true, null, 1f, false });
+        SMBZGlobals.CameraManager.ResetSettings();
+        SoundCache.ins.PlaySound(cc.sounds["pursue"]);
         Comp_CustomAnimator.Play(ASN_Pursue);
         EffectSprite.Create(groundCheck.position, EffectSprite.Sprites.DustPuff, FaceDir == 1);
 
@@ -2404,8 +2364,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     Comp_Rigidbody2D.velocity = new Vector2(t_Comp_Rigidbody2D.velocity.x * 1.25f, Comp_Rigidbody2D.velocity.y);
                     if (isFullPower)
                     {
-                        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                        CameraManager.SetShake(0.35f, 0.1f);
+                        SMBZGlobals.CameraManager.SetShake(0.35f, 0.1f);
                         BattleController.instance.Cinematic_SlowMotion(0.35f);
                     }
                 }
@@ -2418,11 +2377,8 @@ public class DevilMarioControl : CustomBaseCharacter
 
     public override IEnumerator OnBurst_Victory(CharacterControl target, BurstDataStore.VictoryStrikeENUM victoryStrikeType = BurstDataStore.VictoryStrikeENUM.General)
     {
-        Comp_CustomAnimator.m_CurrentProperties.Bursting = false;
-        Comp_CustomAnimator.m_CurrentProperties.DontChangeSprite = true;
-        MethodInfo PlaySoundMethod = typeof(SoundCache).GetMethod("PlaySound", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(AudioClip), typeof(float), typeof(bool), typeof(float?), typeof(float), typeof(bool) }, null);
+        base.OnBurst_Victory(target);
 
-        SetPlayerState(PlayerStateENUM.Cinematic_NoInput);
         SetVelocity(0f, 0f);
         SetGravityOverride(0f);
         IsFacingRight = !IsFacingRight;
@@ -2465,8 +2421,7 @@ public class DevilMarioControl : CustomBaseCharacter
                             bool IsNPC = (bool)t.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(t);
                             if (SaveData.Data.MovementRush_IsEnabled_ViaCriticalStrikes && t != null && !IsNPC && t.IsHurt)
                             {
-                                MovementRushManager MRManager = (MovementRushManager)typeof(BattleController).GetField("MovementRushManager", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(BattleController.instance);
-                                MRManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { t_MyCharacterControl });
+                                SMBZGlobals.MovementRushManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { t_MyCharacterControl });
                             }
                         }
                         else
@@ -2498,7 +2453,6 @@ public class DevilMarioControl : CustomBaseCharacter
                 Comp_InterplayerCollider.Enable();
             }
         });
-        base.OnBurst_Victory(target);
         yield return null;
     }
 
@@ -2576,10 +2530,9 @@ public class DevilMarioControl : CustomBaseCharacter
 
     protected override void Perform_Grounded_DownSpecial()
     {
-        IntensityDataStore Intensity = (IntensityDataStore)typeof(BattleController).GetField("Intensity", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-        if (Intensity.IsCriticalHitReady(MyCharacterControl.ParticipantDataReference.ParticipantIndex))
+        if (SMBZGlobals.Intensity.IsCriticalHitReady(MyCharacterControl.ParticipantDataReference.ParticipantIndex))
         {
-            Intensity.UseCriticalStrike(MyCharacterControl.ParticipantDataReference.ParticipantIndex);
+            SMBZGlobals.Intensity.UseCriticalStrike(MyCharacterControl.ParticipantDataReference.ParticipantIndex);
             PrepareAnAttack(AttBun_CriticalStrike);
         }
         else
@@ -2728,13 +2681,11 @@ public class DevilMarioControl : CustomBaseCharacter
         SetPlayerState(PlayerStateENUM.Cinematic_NoInput);
         Comp_InterplayerCollider.Disable();
 
-        MethodInfo IsThereTwoOrLessPlayersAreAlive = typeof(BattleController).GetMethod("IsThereTwoOrLessPlayersAreAlive", BindingFlags.NonPublic | BindingFlags.Instance);
-        if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
+        if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
         {
             CharacterControl t_MyCharacterControl =
                         (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(RushProperties.Target);
-            BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-            CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
+            SMBZGlobals.CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
         }
 
         StartCoroutine(DelayedRhythmCommand());
@@ -2808,7 +2759,6 @@ public class DevilMarioControl : CustomBaseCharacter
             return true;
         }
 
-        MethodInfo IsThereTwoOrLessPlayersAreAlive = typeof(BattleController).GetMethod("IsThereTwoOrLessPlayersAreAlive", BindingFlags.NonPublic | BindingFlags.Instance);
         CharacterControl t_MyCharacterControl =
             (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(RushProperties.Target);
 
@@ -2898,11 +2848,10 @@ public class DevilMarioControl : CustomBaseCharacter
                 transform.position = RushProperties.Target.transform.position + new Vector3(6 * FaceDir, 6);
                 IsFacingRight = !IsFacingRight;
 
-                if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
+                if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
                 {
-                    BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                    CameraManager.SetTargetGroup_Default();
-                    CameraManager.SetFocusZoom(3.5f);
+                    SMBZGlobals.CameraManager.SetTargetGroup_Default();
+                    SMBZGlobals.CameraManager.SetFocusZoom(3.5f);
                 }
 
                 BattleController.instance.Cinematic_SlowMotion(3f, 0.1f);
@@ -2913,12 +2862,11 @@ public class DevilMarioControl : CustomBaseCharacter
                 break;
 
             case 15:
-                if ((bool)IsThereTwoOrLessPlayersAreAlive.Invoke(BattleController.instance, null))
+                if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
                 {
-                    BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-                    CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
-                    CameraManager.SetShake(0, 0);
-                    CameraManager.SetShake(1f, 0.1f);
+                    SMBZGlobals.CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
+                    SMBZGlobals.CameraManager.SetShake(0, 0);
+                    SMBZGlobals.CameraManager.SetShake(1f, 0.1f);
                 }
 
                 RushProperties.CinematicPart++;
@@ -2949,8 +2897,7 @@ public class DevilMarioControl : CustomBaseCharacter
             typeof(BaseCharacter).GetField("PreventDrag", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(RushProperties.Target, false);
         }
 
-        BattleCameraManager CameraManager = (BattleCameraManager)typeof(BattleController).GetField("CameraManager", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(BattleController.instance);
-        CameraManager.ResetSettings();
+        SMBZGlobals.CameraManager.ResetSettings();
 
         RushProperties = null;
         SetPlayerState(PlayerStateENUM.Idle);
