@@ -392,6 +392,10 @@ public class DevilBooControl : CustomBaseCharacter
                 if (!c_IsNPC)
                     continue;
 
+                PlayerStateENUM state = (PlayerStateENUM)component.GetType().GetField("PlayerState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(component);
+                if (state == PlayerStateENUM.Cinematic_NoInput)
+                    continue;
+
                 if (component.GetType().IsSubclassOf(typeof(BaseAxemRanger_NPC)))
                 {
                     BaseAxemRanger_NPC AxemNPC = (BaseAxemRanger_NPC)component;
@@ -599,6 +603,14 @@ public class DevilBooControl : CustomBaseCharacter
             float dir = Helpers.Vector2ToDegreeAngle_180(transform.position, Possession.Target.transform.position) * Mathf.Deg2Rad;
             speed = Mathf.Min(speed + 1, 25);
             SetVelocity(Mathf.Cos(dir) * speed, Mathf.Sin(dir) * speed);
+
+            PlayerStateENUM state = (PlayerStateENUM)typeof(BaseCharacter).GetField("PlayerState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Possession.Target);
+            if (state == PlayerStateENUM.Cinematic_NoInput)
+            {
+                ClearTaskQueue();
+                SetPlayerState(PlayerStateENUM.Idle);
+                yield break;
+            }
 
             yield return null;
         }
