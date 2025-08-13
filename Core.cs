@@ -29,15 +29,13 @@ namespace DevilMarioMod
             GameObject Prefab = cc.characterData.Prefab_BattleGameObject;
             CustomBaseCharacter old = Prefab.GetComponent<CustomBaseCharacter>();
             DevilMarioControl devilMario = Prefab.AddComponent<DevilMarioControl>();
-            devilMario.Comp_Hurtbox = old.Comp_Hurtbox;
-            devilMario.CharacterData = cc.characterData;
+            devilMario.SetupFromOldComponent(cc, old);
             GameObject.Destroy(old);
 
             GameObject BooPrefab = cc.companions["Boo"].prefab;
             old = BooPrefab.GetComponent<CustomBaseCharacter>();
             DevilBooControl devilBoo = BooPrefab.AddComponent<DevilBooControl>();
-            devilBoo.Comp_Hurtbox = old.Comp_Hurtbox;
-            devilBoo.cc = cc;
+            devilBoo.SetupFromOldComponent(cc, old);
             devilBoo.enabled = true;
             GameObject.Destroy(old);
         }
