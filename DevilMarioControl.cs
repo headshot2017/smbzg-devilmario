@@ -172,7 +172,7 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             atk.OnCustomQueue = delegate
             {
-                SetField("IsComboLinkAvailable", true);
+                IsComboLinkAvailable = true;
                 if (atk.CustomQueueCallCount > 0)
                     AlternateCombo = true;
             };
@@ -206,7 +206,7 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             atk.OnCustomQueue = delegate
             {
-                SetField("IsComboLinkAvailable", true);
+                IsComboLinkAvailable = true;
                 if (atk.CustomQueueCallCount > 0)
                     AlternateCombo = true;
             };
@@ -241,7 +241,7 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             atk.OnCustomQueue = delegate
             {
-                SetField("IsComboLinkAvailable", true);
+                IsComboLinkAvailable = true;
                 if (atk.CustomQueueCallCount > 0)
                     AlternateCombo = true;
             };
@@ -298,7 +298,7 @@ public class DevilMarioControl : CustomBaseCharacter
             {
                 HitBox_0.ReinitializeID();
                 if (atk.CustomQueueCallCount > 0)
-                    SetField("IsComboLinkAvailable", true);
+                    IsComboLinkAvailable = true;
             };
             return atk;
         }
@@ -352,7 +352,7 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             atk.OnCustomQueue = delegate
             {
-                SetField("IsComboLinkAvailable", true);
+                IsComboLinkAvailable = true;
                 if (atk.CustomQueueCallCount > 0)
                     AlternateCombo = true;
             };
@@ -381,7 +381,7 @@ public class DevilMarioControl : CustomBaseCharacter
         },
         OnCustomQueue = delegate
         {
-            SetField("IsComboLinkAvailable", true);
+            IsComboLinkAvailable = true;
         }
     };
 
@@ -406,7 +406,7 @@ public class DevilMarioControl : CustomBaseCharacter
         },
         OnCustomQueue = delegate
         {
-            SetField("IsComboLinkAvailable", true);
+            IsComboLinkAvailable = true;
         }
     };
 
@@ -471,7 +471,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 OnHitSoundEffect = cc.sounds["hit_powerful1"],
                 OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
                 {
-                    bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                    bool IsNPC = SMBZGlobals.GetIsNPC(target);
                     if (target != null && !IsNPC && !wasBlocked)
                     {
                         Staleable_SmackDown.Set();
@@ -502,7 +502,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 OnHitSoundEffect = cc.sounds[$"hit{UnityEngine.Random.Range(11, 14)}"],
                 OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
                 {
-                    bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                    bool IsNPC = SMBZGlobals.GetIsNPC(target);
                     if (target != null && !IsNPC && !wasBlocked)
                     {
                         Staleable_LegSweep.Set();
@@ -547,15 +547,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 FreezeTime = 0.02f,
                 Priority = BattleCache.PriorityType.Light,
                 HitSpark = new EffectSprite.Parameters(EffectSprite.Sprites.HitsparkBlunt),
-                OnHitSoundEffect = cc.sounds[$"hit{UnityEngine.Random.Range(0, 4)}"],
-                OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
-                {
-                    bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
-                    if (target != null && !IsNPC && !wasBlocked)
-                    {
-
-                    }
-                }
+                OnHitSoundEffect = cc.sounds[$"hit{UnityEngine.Random.Range(0, 4)}"]
             };
             AttackBundle end = new AttackBundle
             {
@@ -613,7 +605,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 OnHitSoundEffect = cc.sounds["hit_powerful1"],
                 OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
                 {
-                    bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                    bool IsNPC = SMBZGlobals.GetIsNPC(target);
                     if (target != null && !IsNPC && !wasBlocked)
                     {
                         Staleable_Uppercut.Set();
@@ -642,7 +634,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 OnHitSoundEffect = cc.sounds["hit_powerful2"],
                 OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
                 {
-                    bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                    bool IsNPC = SMBZGlobals.GetIsNPC(target);
                     if (target != null && !IsNPC && !wasBlocked)
                     {
                         Staleable_SuperUppercut.Set();
@@ -652,13 +644,13 @@ public class DevilMarioControl : CustomBaseCharacter
         },
         OnHit = delegate (BaseCharacter target, bool wasBlocked)
         {
-            bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+            bool IsNPC = SMBZGlobals.GetIsNPC(target);
             if (!IsNPC && !wasBlocked)
             {
-                CharacterControl t_MyCharacterControl = (CharacterControl)target.GetType().GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(target);
                 if (t_MyCharacterControl.ParticipantDataReference.Stun.GetCurrent() >= t_MyCharacterControl.ParticipantDataReference.Stun.Max)
                 {
-                    target.GetType().GetProperty("HitStun", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, 1.5f);
+                    SMBZGlobals.SetHitStun(target, 1.5f);
                     PrepareAnAttack(AttBun_SuperUppercut_Rush);
                 }
             }
@@ -700,11 +692,10 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             bundle.OnHit = delegate (BaseCharacter target, bool wasBlocked)
             {
-                bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                bool IsNPC = SMBZGlobals.GetIsNPC(target);
                 if (target != null && !IsNPC && !wasBlocked)
                 {
-                    CharacterControl t_MyCharacterControl =
-                        (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                    CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(target);
 
                     if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
                         SMBZGlobals.CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
@@ -752,7 +743,7 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             properties.OnHitCallback = delegate (BaseCharacter target, bool wasblocked)
             {
-                bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                bool IsNPC = SMBZGlobals.GetIsNPC(target);
                 if (IsNPC)
                 {
                     target.Hurt(new TakeDamageRequest(GetMyParticipantDataReference())
@@ -791,7 +782,7 @@ public class DevilMarioControl : CustomBaseCharacter
             CurrentAttackData = null;
 
             CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-            Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+            Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
             if (target_Comp_CustomAnimator)
                 target_Comp_CustomAnimator.enabled = true;
             else
@@ -805,7 +796,7 @@ public class DevilMarioControl : CustomBaseCharacter
             Comp_InterplayerCollider.Enable();
 
             CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-            Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+            Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
             if (target_Comp_CustomAnimator)
                 target_Comp_CustomAnimator.enabled = true;
             else
@@ -817,7 +808,7 @@ public class DevilMarioControl : CustomBaseCharacter
         OnUpdate = delegate
         {
             CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-            Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+            Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
             if (target_Comp_CustomAnimator)
             {
                 target_Comp_CustomAnimator.enabled = false;
@@ -902,7 +893,7 @@ public class DevilMarioControl : CustomBaseCharacter
                             Comp_InterplayerCollider.Enable();
 
                             CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-                            Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+                            Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
                             if (target_Comp_CustomAnimator)
                                 target_Comp_CustomAnimator.enabled = true;
                             else
@@ -917,7 +908,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     Comp_InterplayerCollider.Enable();
 
                     CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-                    Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+                    Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
                     if (target_Comp_CustomAnimator)
                         target_Comp_CustomAnimator.enabled = true;
                     else
@@ -965,7 +956,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     Comp_InterplayerCollider.Enable();
 
                     CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-                    Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+                    Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
                     if (target_Comp_CustomAnimator)
                         target_Comp_CustomAnimator.enabled = true;
                     else
@@ -986,7 +977,7 @@ public class DevilMarioControl : CustomBaseCharacter
                         Comp_InterplayerCollider.Enable();
 
                         CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-                        Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+                        Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
                         if (target_Comp_CustomAnimator)
                             target_Comp_CustomAnimator.enabled = true;
                         else
@@ -1044,7 +1035,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     BaseCharacter grappled = GrappleData.Release();
 
                     CustomAnimator target_Comp_CustomAnimator = grappled.GetComponent<CustomAnimator>();
-                    Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(grappled);
+                    Animator target_Comp_Animator = grappled.GetComponent<Animator>();
                     if (target_Comp_CustomAnimator)
                         target_Comp_CustomAnimator.enabled = true;
                     else
@@ -1108,7 +1099,7 @@ public class DevilMarioControl : CustomBaseCharacter
                         BaseCharacter grappled = GrappleData.Release();
 
                         CustomAnimator target_Comp_CustomAnimator = grappled.GetComponent<CustomAnimator>();
-                        Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(grappled);
+                        Animator target_Comp_Animator = grappled.GetComponent<Animator>();
                         if (target_Comp_CustomAnimator)
                             target_Comp_CustomAnimator.enabled = true;
                         else
@@ -1220,7 +1211,7 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             properties.OnHitCallback = delegate (BaseCharacter target, bool wasblocked)
             {
-                bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                bool IsNPC = SMBZGlobals.GetIsNPC(target);
                 if (IsNPC)
                 {
                     target.Hurt(new TakeDamageRequest(GetMyParticipantDataReference())
@@ -1236,7 +1227,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 {
                     properties.HitStun = 0;
                     properties.OnHitSoundEffect = null;
-                    SetField("IsIntangible", true);
+                    IsIntangible = true;
                     GrappleData.Grab(target, base.HitBox_0.transform);
                     PrepareAnAttack(AttBun_AirGrab_Success);
                 }
@@ -1264,7 +1255,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 return;
             }
 
-            Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+            Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
             target_Comp_Animator.enabled = false;
             if (target_Comp_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash != ASN_Grounded)
             {
@@ -1286,7 +1277,7 @@ public class DevilMarioControl : CustomBaseCharacter
             SoundCache.ins.PlaySound(cc.sounds["hit4"]);
 
             CustomAnimator target_Comp_CustomAnimator = GrappleData.GrappledTarget.GetComponent<CustomAnimator>();
-            Animator target_Comp_Animator = (Animator)typeof(BaseCharacter).GetField("Comp_Animator", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+            Animator target_Comp_Animator = GrappleData.GrappledTarget.GetComponent<Animator>();
             if (target_Comp_CustomAnimator)
                 target_Comp_CustomAnimator.enabled = true;
             else
@@ -1304,7 +1295,7 @@ public class DevilMarioControl : CustomBaseCharacter
 
             Staleable_AirGrab.Set();
 
-            SetField("IsIntangible", false);
+            IsIntangible = false;
             SetPlayerState(PlayerStateENUM.Attacking);
         }
     };
@@ -1378,7 +1369,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     GetHitboxDamageProperties().OnHitSoundEffect = cc.sounds["hit4"];
                     GetHitboxDamageProperties().OnHitCallback = delegate (BaseCharacter target, bool wasBlocked)
                     {
-                        bool IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                        bool IsNPC = SMBZGlobals.GetIsNPC(target);
                         if (target != null && !IsNPC && !wasBlocked)
                         {
                             //Staleable_Stomp.Set();
@@ -1403,7 +1394,7 @@ public class DevilMarioControl : CustomBaseCharacter
             SetPlayerState(PlayerStateENUM.Attacking);
             SetGravityOverride(3f);
             SetVelocity(0, 15f);
-            SetField("IsIntangible", true);
+            IsIntangible = true;
             SetHitboxDamageProperties(new HitBoxDamageParameters
             {
                 Owner = this,
@@ -1451,7 +1442,7 @@ public class DevilMarioControl : CustomBaseCharacter
         },
         OnCustomQueue = delegate
         {
-            SetField("IsIntangible", false);
+            IsIntangible = false;
         }
     };
 
@@ -1638,21 +1629,20 @@ public class DevilMarioControl : CustomBaseCharacter
             };
             atk.OnHit = delegate (BaseCharacter target, bool wasBlocked)
             {
-                bool t_IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(target);
+                bool t_IsNPC = SMBZGlobals.GetIsNPC(target);
                 if (!(target == null) && !t_IsNPC && target.IsHurt)
                 {
                     SetPlayerState(PlayerStateENUM.Cinematic_NoInput);
                     CancelAndRefundPursue();
-                    SetField("IsIntangible", true);
+                    IsIntangible = true;
                     if (SaveData.Data.MovementRush_IsEnabled_ViaCriticalStrikes)
                     {
-                        CharacterControl targetControl = (CharacterControl)GetType().GetField("MyCharacterControl", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(target);
+                        CharacterControl targetControl = SMBZGlobals.GetCharacterControl(target);
                         SMBZGlobals.MovementRushManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { targetControl });
                     }
                     else
                     {
-                        CharacterControl t_MyCharacterControl =
-                        (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                        CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(target);
 
                         if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
                         {
@@ -2059,8 +2049,8 @@ public class DevilMarioControl : CustomBaseCharacter
         PossessionCooldown = 0;
         GrappleData = new GrappleClass();
 
-        SetField("EnergyMax", 200f);
-        SetField("EnergyStart", 100f);
+        EnergyMax = 200f;
+        EnergyStart = 100f;
     }
 
     protected override void Start()
@@ -2120,7 +2110,7 @@ public class DevilMarioControl : CustomBaseCharacter
         base.FixedUpdate();
         if (GrappleData != null && GrappleData.IsActive && GrappleData.GrappledTarget != null)
         {
-            Rigidbody2D target_Comp_Rigidbody2D = (Rigidbody2D)typeof(BaseCharacter).GetField("Comp_Rigidbody2D", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(GrappleData.GrappledTarget);
+            Rigidbody2D target_Comp_Rigidbody2D = SMBZGlobals.GetRigidbody2D(GrappleData.GrappledTarget);
             GrappleData.GrappledTarget.SetVelocity(GetVelocity());
             GrappleData.GrappledTarget.SetGravityOverride(0f);
             target_Comp_Rigidbody2D.MovePosition(Vector2.MoveTowards(target_Comp_Rigidbody2D.position, GrappleData.HoldPosition.position, 30f * BattleController.instance.ActorDeltaTime));
@@ -2168,7 +2158,7 @@ public class DevilMarioControl : CustomBaseCharacter
     {
         base.OnClash(opponent);
 
-        if ((bool)GetProperty("IgnoreClashes")) return;
+        if (IgnoreClashes) return;
 
         SoundCache.ins.PlaySound(cc.sounds["explosion"]);
     }
@@ -2182,8 +2172,6 @@ public class DevilMarioControl : CustomBaseCharacter
 
     protected override void Update_Pursue()
     {
-        bool IsFrozen = (bool)GetField("IsFrozen");
-
         if (IsFrozen || PursueData == null)
         {
             return;
@@ -2217,7 +2205,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 PursueData.IsPreping = false;
                 p_isCharging.SetValue(PursueData, false);
                 SetPlayerState(PlayerStateENUM.Pursuing);
-                SetField("ComboSwingCounter", 0);
+                ComboSwingCounter = 0;
                 float num = Helpers.Vector2ToDegreeAngle_180(transform.position, PursueData.Target.transform.position);
                 IsFacingRight = (-90f <= num && num <= 90f);
                 PursueData.Direction = (FaceDir == 1 ? Vector2.right : Vector2.left);
@@ -2266,7 +2254,7 @@ public class DevilMarioControl : CustomBaseCharacter
 
     public IEnumerator SuperPursueCinematic()
     {
-        SetField("IsIntangible", true);
+        IsIntangible = true;
         Comp_InterplayerCollider.Disable();
 
         if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
@@ -2280,7 +2268,7 @@ public class DevilMarioControl : CustomBaseCharacter
         EffectSprite.Create(base.transform.position, EffectSprite.Sprites.CriticalPower, FaceDir == 1);
         yield return new WaitForSeconds(0.9f);
 
-        SetField("IsIntangible", false);
+        IsIntangible = false;
         Comp_InterplayerCollider.Enable();
         SMBZGlobals.CameraManager.ResetSettings();
         SoundCache.ins.PlaySound(cc.sounds["pursue"]);
@@ -2306,7 +2294,6 @@ public class DevilMarioControl : CustomBaseCharacter
         PursueData = null;
         if (IsCPUControlled)
         {
-            AI_Bundle AI = (AI_Bundle)typeof(CharacterControl).GetField("AI", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(MyCharacterControl);
             AI.PursueIdea = null;
         }
     }
@@ -2348,7 +2335,7 @@ public class DevilMarioControl : CustomBaseCharacter
             },
             OnHit = delegate (BaseCharacter target, bool wasBlocked)
             {
-                bool t_IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(target);
+                bool t_IsNPC = SMBZGlobals.GetIsNPC(target);
                 if (!t_IsNPC)
                 {
                     SetPlayerState(PlayerStateENUM.Attacking);
@@ -2356,8 +2343,8 @@ public class DevilMarioControl : CustomBaseCharacter
                     StartCoroutine(OnPursueContact());
                 }
 
-                float t_BlockStun = (float)target.GetType().GetField("BlockStun", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(target);
-                Rigidbody2D t_Comp_Rigidbody2D = (Rigidbody2D)target.GetType().GetField("Comp_Rigidbody2D", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(target);
+                float t_BlockStun = SMBZGlobals.GetBlockStun(target);
+                Rigidbody2D t_Comp_Rigidbody2D = SMBZGlobals.GetRigidbody2D(target);
 
                 if (target != null && (target.IsHurt || !(t_BlockStun <= 0f)))
                 {
@@ -2408,8 +2395,7 @@ public class DevilMarioControl : CustomBaseCharacter
                     OnHitSoundEffect = cc.sounds["hit5"],
                     OnHitCallback = delegate (BaseCharacter t, bool b)
                     {
-                        CharacterControl t_MyCharacterControl =
-                            (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(t);
+                        CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(t);
 
                         if (t != null && target == t_MyCharacterControl)
                         {
@@ -2418,7 +2404,7 @@ public class DevilMarioControl : CustomBaseCharacter
 
                         if (isMrStarter)
                         {
-                            bool IsNPC = (bool)t.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(t);
+                            bool IsNPC = SMBZGlobals.GetIsNPC(t);
                             if (SaveData.Data.MovementRush_IsEnabled_ViaCriticalStrikes && t != null && !IsNPC && t.IsHurt)
                             {
                                 SMBZGlobals.MovementRushManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { t_MyCharacterControl });
@@ -2475,7 +2461,6 @@ public class DevilMarioControl : CustomBaseCharacter
 
     protected override void Perform_Grounded_NeutralAttack()
     {
-        int ComboSwingCounter = (int)GetField("ComboSwingCounter");
         switch(ComboSwingCounter)
         {
             case 0:
@@ -2505,7 +2490,6 @@ public class DevilMarioControl : CustomBaseCharacter
                 ComboSwingCounter = 0;
                 break;
         }
-        SetField("ComboSwingCounter", ComboSwingCounter);
     }
 
     protected override void Perform_Grounded_UpAttack()
@@ -2576,7 +2560,7 @@ public class DevilMarioControl : CustomBaseCharacter
         if (MyCharacterControl.ParticipantDataReference.Energy.GetCurrent() < 100f)
             return;
 
-        SetField("IsComboLinkAvailable", false);
+        IsComboLinkAvailable = false;
         if (!IsCPUControlled)
         {
             MyCharacterControl.Button_A.IsBuffered = false;
@@ -2636,7 +2620,7 @@ public class DevilMarioControl : CustomBaseCharacter
         if (MyCharacterControl.ParticipantDataReference.Energy.GetCurrent() < 200f)
             return;
 
-        SetField("IsComboLinkAvailable", false);
+        IsComboLinkAvailable = false;
         if (!IsCPUControlled)
         {
             MyCharacterControl.Button_A.IsBuffered = false;
@@ -2676,22 +2660,21 @@ public class DevilMarioControl : CustomBaseCharacter
     protected void Begin_Rush()
     {
         BattleController.Invoke_OnRushStart_Event(MyCharacterControl);
-        SetField("IsIntangible", true);
-        SetField("IsRushing", true);
+        IsIntangible = true;
+        IsRushing = true;
         SetPlayerState(PlayerStateENUM.Cinematic_NoInput);
         Comp_InterplayerCollider.Disable();
 
         if (SMBZGlobals.IsThereTwoOrLessPlayersAreAlive())
         {
-            CharacterControl t_MyCharacterControl =
-                        (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(RushProperties.Target);
+            CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(RushProperties.Target);
             SMBZGlobals.CameraManager.SetTargetGroup(t_MyCharacterControl.transform);
         }
 
         StartCoroutine(DelayedRhythmCommand());
 
-        typeof(BaseCharacter).GetProperty("HitStun", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(RushProperties.Target, 20f);
-        typeof(BaseCharacter).GetField("PreventDrag", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(RushProperties.Target, true);
+        SMBZGlobals.SetHitStun(RushProperties.Target, 20f);
+        SMBZGlobals.SetPreventDrag(RushProperties.Target, true);
         RushProperties.CinematicWaitTimer = 0.75f;
         RushProperties.CinematicPart = 0;
     }
@@ -2749,8 +2732,8 @@ public class DevilMarioControl : CustomBaseCharacter
             return false;
         }
 
-        typeof(BaseCharacter).GetProperty("HitStun", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(RushProperties.Target, 20f);
-        typeof(BaseCharacter).GetField("PreventDrag", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(RushProperties.Target, true);
+        SMBZGlobals.SetHitStun(RushProperties.Target, 20f);
+        SMBZGlobals.SetPreventDrag(RushProperties.Target, true);
 
         Update_RushRhythmCommandReading(RushProperties);
         if (RushProperties.CinematicWaitTimer > 0f)
@@ -2759,8 +2742,7 @@ public class DevilMarioControl : CustomBaseCharacter
             return true;
         }
 
-        CharacterControl t_MyCharacterControl =
-            (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(RushProperties.Target);
+        CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(RushProperties.Target);
 
         switch (RushProperties.CinematicPart)
         {
@@ -2890,11 +2872,11 @@ public class DevilMarioControl : CustomBaseCharacter
         MyCharacterControl.DestroyRhythmCommand();
         if (RushProperties?.Target != null)
         {
-            CharacterControl t_MyCharacterControl = (CharacterControl)typeof(BaseCharacter).GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(RushProperties.Target);
+            CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(RushProperties.Target);
             RushProperties.Target.ResetGravity();
             t_MyCharacterControl.ParticipantDataReference.SetStun(0f);
-            typeof(BaseCharacter).GetProperty("HitStun", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(RushProperties.Target, 0.75f);
-            typeof(BaseCharacter).GetField("PreventDrag", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(RushProperties.Target, false);
+            SMBZGlobals.SetHitStun(RushProperties.Target, 0.75f);
+            SMBZGlobals.SetPreventDrag(RushProperties.Target, false);
         }
 
         SMBZGlobals.CameraManager.ResetSettings();
@@ -2903,8 +2885,8 @@ public class DevilMarioControl : CustomBaseCharacter
         SetPlayerState(PlayerStateENUM.Idle);
         InterruptAndNullifyPreparedAttack();
         ResetGravity();
-        SetField("IsRushing", false);
-        SetField("IsIntangible", false);
+        IsRushing = false;
+        IsIntangible = false;
         Comp_InterplayerCollider.Enable();
         MyCharacterControl.InputLockTimer = 0.5f;
     }
@@ -2914,8 +2896,6 @@ public class DevilMarioControl : CustomBaseCharacter
         // references: MarioControl, YoshiControl, BasilisxControl
 
         base.Update_CPU_Thoughts();
-
-        AI_Bundle AI = (AI_Bundle)typeof(CharacterControl).GetField("AI", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(MyCharacterControl);
 
         if (!AI.DeltaData.ShouldContinueWithProcessing)
             return;
@@ -3062,7 +3042,7 @@ public class DevilMarioControl : CustomBaseCharacter
                                 break;
 
                             case 4:
-                                CharacterControl t_MyCharacterControl = (CharacterControl)AI.DeltaData.Target.GetType().GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(AI.DeltaData.Target);
+                                CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(AI.DeltaData.Target);
                                 if (t_MyCharacterControl.ParticipantDataReference.Stun.GetCurrent() >= t_MyCharacterControl.ParticipantDataReference.Stun.Max)
                                 {
                                     AI.CommandList.Set(new AI_Bundle.AI_Action[]
@@ -3112,7 +3092,7 @@ public class DevilMarioControl : CustomBaseCharacter
                                 break;
 
                             case 4:
-                                CharacterControl t_MyCharacterControl = (CharacterControl)AI.DeltaData.Target.GetType().GetField("MyCharacterControl", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(AI.DeltaData.Target);
+                                CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(AI.DeltaData.Target);
                                 if (t_MyCharacterControl.ParticipantDataReference.Stun.GetCurrent() >= t_MyCharacterControl.ParticipantDataReference.Stun.Max)
                                 {
                                     AI.CommandList.Set(new AI_Bundle.AI_Action[]

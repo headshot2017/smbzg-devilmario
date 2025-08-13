@@ -266,7 +266,7 @@ public class DevilBooControl : CustomBaseCharacter
     public virtual void Despawn()
     {
         SetPlayerState(PlayerStateENUM.Idle);
-        SetField("IsIntangible", true);
+        IsIntangible = true;
         if (GetHitboxDamageProperties() != null)
         {
             GetHitboxDamageProperties().IsNullified = true;
@@ -337,12 +337,12 @@ public class DevilBooControl : CustomBaseCharacter
             if (base.IsOnGround && request.launch.y < -5f)
             {
                 request.launch.y *= -1f;
-                SetField("DragOverride", 2f);
+                DragOverride = 2f;
                 SetVelocity(request.launch);
             }
             else
             {
-                SetField("DragOverride", 2f);
+                DragOverride = 2f;
                 SetVelocity(request.launch);
             }
 
@@ -426,22 +426,22 @@ public class DevilBooControl : CustomBaseCharacter
 
     private IEnumerator WaitTilStopMoving()
     {
-        SetField("DragOverride", 15f);
-        SetField("IsIntangible", true);
+        DragOverride = 15f;
+        IsIntangible = true;
         SetPlayerState(PlayerStateENUM.Attacking);
         HitBox_0.IsActive = false;
 
         while (GetVelocity().magnitude > 0.1f) yield return null;
 
-        SetField("IsIntangible", false);
+        IsIntangible = false;
         SetPlayerState(PlayerStateENUM.Idle);
         yield break;
     }
 
     private IEnumerator FlyBackToLeader()
     {
-        SetField("DragOverride", 0f);
-        SetField("IsIntangible", true);
+        DragOverride = 0f;
+        IsIntangible = true;
         UpdateSpriteSortOrder(-30);
         SetPlayerState(PlayerStateENUM.Attacking);
         HitBox_0.IsActive = false;
@@ -476,8 +476,8 @@ public class DevilBooControl : CustomBaseCharacter
 
     private IEnumerator Attack_Launch()
     {
-        SetField("DragOverride", 0f);
-        SetField("IsIntangible", false);
+        DragOverride = 0f;
+        IsIntangible = false;
 
         BaseCharacter target = FindClosestTarget(true);
         if (target == null)
@@ -531,7 +531,7 @@ public class DevilBooControl : CustomBaseCharacter
             },
             OnHit = delegate (BaseCharacter target, bool wasBlocked)
             {
-                bool t_IsNPC = (bool)target.GetType().GetField("IsNPC", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+                bool t_IsNPC = SMBZGlobals.GetIsNPC(target);
                 if (!t_IsNPC)
                 {
                     lifetime = 1;
@@ -590,8 +590,8 @@ public class DevilBooControl : CustomBaseCharacter
 
     private IEnumerator Attack_Possess()
     {
-        SetField("DragOverride", 0f);
-        SetField("IsIntangible", true);
+        DragOverride = 0f;
+        IsIntangible = true;
         UpdateSpriteSortOrder(-30);
         SetPlayerState(PlayerStateENUM.Attacking);
         Comp_CustomAnimator.Play("Move");
