@@ -1423,7 +1423,7 @@ public class DevilMarioControl : CustomBaseCharacter
         {
             SMBZGlobals.CameraManager.SetShake(0.2f, 0.15f);
             if (SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater != null)
-                GameObject.Instantiate(SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater, GetGroundPositionViaRaycast(), Quaternion.identity);
+                GameObject.Instantiate(SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater, GetGroundPositionViaRaycast(), Quaternion.identity).SetActive(true);
 
             ResetGravity();
             SetPlayerState(PlayerStateENUM.Attacking);
@@ -2025,7 +2025,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 DustPoofEffect.Create(effectSprite.transform.position + Vector3.right, DustPoofEffect.Animations.DustPoof_Gray, isFacingRight: true, 3f, AnimateUsingUnscaledTime: false, AlwaysAppearAboveFighters: true, 3f, 0.25f);
 
                 if (SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater != null)
-                    GameObject.Instantiate(SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater, groundPositionViaRaycast2, Quaternion.identity);
+                    GameObject.Instantiate(SMBZGlobals.ActiveBattleBackgroundData.Prefab_Crater, groundPositionViaRaycast2, Quaternion.identity).SetActive(true);
             });
         }
     };
