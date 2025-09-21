@@ -597,7 +597,7 @@ public class DevilMarioControl : CustomBaseCharacter
                 Owner = this,
                 Tag = base.tag,
                 Damage = 1.5f,
-                GetHitStun = () => 0.7f - (0.1f * Staleable_Uppercut.StaleHitCount),
+                GetHitStun = () => 0.8f - (0.1f * Staleable_Uppercut.StaleHitCount),
                 Launch = new Vector2(2 * FaceDir, 16f),
                 FreezeTime = 0.04f,
                 Priority = BattleCache.PriorityType.Light,
@@ -2039,7 +2039,6 @@ public class DevilMarioControl : CustomBaseCharacter
         GroundedAcceleration = 30f;
         GroundedDrag = 3f;
         HopPower = 10.5f;
-        JumpChargeMax = 0f;
         Pursue_Speed = 40f;
         Pursue_StartupDelay = 0.1f;
         AlternateCombo = false;
