@@ -1635,12 +1635,12 @@ public class DevilMarioControl : CustomBaseCharacter
                     SetPlayerState(PlayerStateENUM.Cinematic_NoInput);
                     CancelAndRefundPursue();
                     IsIntangible = true;
-                    if (SaveData.Data.MovementRush_IsEnabled_ViaCriticalStrikes)
+                    if (SaveData.Data.CriticalStrikeResult == 0)
                     {
                         CharacterControl targetControl = SMBZGlobals.GetCharacterControl(target);
                         SMBZGlobals.MovementRushManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { targetControl });
                     }
-                    else
+                    else if (SaveData.Data.CriticalStrikeResult == 1)
                     {
                         CharacterControl t_MyCharacterControl = SMBZGlobals.GetCharacterControl(target);
 
@@ -2404,7 +2404,7 @@ public class DevilMarioControl : CustomBaseCharacter
                         if (isMrStarter)
                         {
                             bool IsNPC = SMBZGlobals.GetIsNPC(t);
-                            if (SaveData.Data.MovementRush_IsEnabled_ViaCriticalStrikes && t != null && !IsNPC && t.IsHurt)
+                            if (SaveData.Data.CriticalStrikeResult == 0 && t != null && !IsNPC && t.IsHurt)
                             {
                                 SMBZGlobals.MovementRushManager.StartNewMovementRush(FaceDir == 1, new List<CharacterControl> { MyCharacterControl }, new List<CharacterControl> { t_MyCharacterControl });
                             }
