@@ -306,7 +306,7 @@ public class DevilBooControl : CustomBaseCharacter
         SMBZGlobals.Intensity.IncreaseBy(request.intensity);
         if (base.IsGuarding && !request.isBackAttack && !request.isUnblockable)
         {
-            SetVelocity(request.blockedLaunch);
+            if (request.blockedLaunch.HasValue) SetVelocity(request.blockedLaunch.Value);
             SetField("BlockStun", request.blockStun.Value);
             EffectSprite.Create(base.transform.position, EffectSprite.Sprites.HitsparkBlock, FaceDir == 1);
             SoundCache.ins.PlaySound(SoundCache.ins.Battle_Hit_1B);
@@ -334,16 +334,19 @@ public class DevilBooControl : CustomBaseCharacter
                 SoundCache.ins.PlaySound(request.OnHitSoundEffect);
             }
 
-            if (base.IsOnGround && request.launch.y < -5f)
+            if (request.launch.HasValue)
             {
-                request.launch.y *= -1f;
-                DragOverride = 2f;
-                SetVelocity(request.launch);
-            }
-            else
-            {
-                DragOverride = 2f;
-                SetVelocity(request.launch);
+                if (base.IsOnGround && request.launch.Value.y < -5f)
+                {
+                    request.launch = new Vector2(request.launch.Value.x, request.launch.Value.y * -1);
+                    DragOverride = 2f;
+                    SetVelocity(request.launch.Value);
+                }
+                else
+                {
+                    DragOverride = 2f;
+                    SetVelocity(request.launch.Value);
+                }
             }
 
             ClearTaskQueue();
