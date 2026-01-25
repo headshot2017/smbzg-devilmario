@@ -2176,8 +2176,6 @@ public class DevilMarioControl : CustomBaseCharacter
             return;
         }
 
-        FieldInfo p_isCharging = typeof(PursueBundle).GetField("isCharging", BindingFlags.NonPublic | BindingFlags.Instance);
-
         if (PursueData.Target == null)
         {
             PursueData.Target = FindClosestTarget();
@@ -2197,12 +2195,12 @@ public class DevilMarioControl : CustomBaseCharacter
                 PursueData.StartupCountdown = 0.15f;
             }
 
-            if (PursueData.StartupCountdown <= 0f && (!(bool)p_isCharging.GetValue(PursueData) || ((bool)p_isCharging.GetValue(PursueData) && PursueData.ChargePower >= 100f)) && IsOnGround)
+            if (PursueData.StartupCountdown <= 0f && (!PursueData.isCharging || (PursueData.isCharging && PursueData.ChargePower >= 100f)) && IsOnGround)
             {
                 PursueData.PursueCountdown = 10f;
                 PursueData.IsPursuing = true;
                 PursueData.IsPreping = false;
-                p_isCharging.SetValue(PursueData, false);
+                PursueData.isCharging = false;
                 SetPlayerState(PlayerStateENUM.Pursuing);
                 ComboSwingCounter = 0;
                 float num = Helpers.Vector2ToDegreeAngle_180(transform.position, PursueData.Target.transform.position);
