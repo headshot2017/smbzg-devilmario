@@ -93,7 +93,7 @@ public class DevilMarioInventoryDataModel
                 UI_InventoryItem uI_InventoryItem2 = UI_Boos.ElementAtOrDefault(i);
                 if (uI_InventoryItem2 == null)
                 {
-                    uI_InventoryItem2 = ui.InstantiateItem(cc.companions["Boo"].animations[Animator.StringToHash("Move")].actions[0].frame);
+                    uI_InventoryItem2 = ui.InstantiateItem(cc.icons["Boo"]);
                     uI_InventoryItem2.Comp_Sprite.type = Image.Type.Filled;
                     uI_InventoryItem2.Comp_Sprite.fillMethod = Image.FillMethod.Horizontal;
                     uI_InventoryItem2.Comp_Sprite.fillOrigin = 0;
