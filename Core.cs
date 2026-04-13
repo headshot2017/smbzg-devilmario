@@ -2,7 +2,7 @@
 using UnityEngine;
 using SMBZG;
 
-[assembly: MelonInfo(typeof(DevilMarioMod.Core), "DevilMario", "1.6.0", "Headshotnoby/headshot2017", null)]
+[assembly: MelonInfo(typeof(DevilMarioMod.Core), "DevilMario", "1.7.0", "Headshotnoby/headshot2017", null)]
 [assembly: MelonGame("Jonathan Miller aka Zethros", "SMBZ-G")]
 
 namespace DevilMarioMod
